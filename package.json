@@ -16,6 +16,8 @@
   },
   "homepage": "https://github.com/shwilliam/time-where#readme",
   "dependencies": {
+    "downshift": "^5.2.7",
+    "moment-timezone": "^0.5.28",
     "parcel-bundler": "^1.12.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"

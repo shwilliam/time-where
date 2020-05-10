@@ -1,4 +1,7 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import moment from 'moment-timezone'
+import {TimezonesCombobox} from './components'
+import {TimezonesContext} from './context'
 
 const TIMELINE_STEP_HEIGHT = 40
 
@@ -16,25 +19,34 @@ const TimelineHourMarkers = ({days = 1}) =>
   )
 
 const Timeline = () => {
-  const TEMP_TIMES = [
-    {label: 'San Fransisco', hour: 10, minutes: 23},
-    {label: 'Stockholm', hour: 21, minutes: 23},
-  ]
+  const {timezones} = useContext(TimezonesContext)
 
   return (
     <div className="timeline">
-      {TEMP_TIMES.map(({label, hour, minutes}) => (
-        <div
-          className="timeline__track-marker"
-          style={{top: (hour + minutes / 60) * TIMELINE_STEP_HEIGHT}}
-          key={label}
-        >
-          <p className="timeline__track-marker-time">
-            {hour}:{minutes}
-          </p>
-          <p className="timeline__track-marker-label">{label}</p>
-        </div>
-      ))}
+      {timezones.map(({name, value}) => {
+        const time = moment().tz(value)
+        const hour24 = time.format('H')
+        const hour12 = time.format('h')
+        const minutes = time.format('mm')
+        const period = time.format('a')
+
+        return (
+          <div
+            className="timeline__track-marker"
+            style={{
+              top:
+                (Number(hour24) + Number(minutes) / 60) * TIMELINE_STEP_HEIGHT,
+            }}
+            key={value}
+          >
+            <p className="timeline__track-marker-time">
+              {hour12}:{minutes}
+              <span className="timeline__track-marker-period">{period}</span>
+            </p>
+            <p className="timeline__track-marker-label">{name}</p>
+          </div>
+        )
+      })}
 
       <div className="timeline__track">
         <TimelineHourMarkers />
@@ -44,7 +56,13 @@ const Timeline = () => {
 }
 
 export const App = () => (
-  <main className="main">
-    <Timeline />
-  </main>
+  <>
+    <header className="header">
+      <h1 className="sr-only">Time? Where?</h1>
+      <TimezonesCombobox />
+    </header>
+    <main className="main">
+      <Timeline />
+    </main>
+  </>
 )
