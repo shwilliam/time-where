@@ -1,22 +1,29 @@
 import React, {useContext} from 'react'
+import {motion} from 'framer-motion'
 import moment from 'moment-timezone'
 import {TimezonesCombobox} from './components'
 import {TimezonesContext} from './context'
 
 const TIMELINE_STEP_HEIGHT = 40
 
-const TimelineHourMarkers = ({days = 1}) =>
-  Array.from({length: days}, () =>
-    Array.from({length: 25}, (_, i) => (
-      <div
-        className="timeline__track-division"
-        data-time={i > 12 ? 'night' : 'day'}
-        key={i}
-      >
+const TimelineHourMarkers = () =>
+  Array.from({length: 25}, (_, i) => (
+    <div
+      className="timeline__track-division"
+      data-time={i > 12 ? 'night' : 'day'}
+      key={i}
+    />
+  ))
+
+const TimelineHourMarkersLabels = () => (
+  <div className="timeline__track-hour-container">
+    {Array.from({length: 25}, (_, i) => (
+      <div className="timeline__track-division" key={i}>
         {i !== 0 && <p className="timeline__track-hour-label">{i}</p>}
       </div>
-    )),
-  )
+    ))}
+  </div>
+)
 
 const Timeline = () => {
   const {timezones} = useContext(TimezonesContext)
@@ -31,8 +38,12 @@ const Timeline = () => {
         const period = time.format('a')
 
         return (
-          <div
+          <motion.div
             className="timeline__track-marker"
+            drag="x"
+            dragConstraints={{left: -(window.innerWidth / 2), right: 0}}
+            dragElastic={0}
+            dragMomentum={false}
             style={{
               top:
                 (Number(hour24) + Number(minutes) / 60) * TIMELINE_STEP_HEIGHT,
@@ -44,12 +55,13 @@ const Timeline = () => {
               <span className="timeline__track-marker-period">{period}</span>
             </p>
             <p className="timeline__track-marker-label">{name}</p>
-          </div>
+          </motion.div>
         )
       })}
 
       <div className="timeline__track">
         <TimelineHourMarkers />
+        <TimelineHourMarkersLabels />
       </div>
     </div>
   )
