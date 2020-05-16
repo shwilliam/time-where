@@ -3,7 +3,7 @@
   --color__ui: #f2f4f5;
   --color__ui--highlight: #222;
   --color__text: #222;
-  --color__text--secondary: #666;
+  --color__text--secondary: #ccc;
   --color__text--highlight: #c3574d;
   --timeline__h-offset: 50px;
   --timeline__step-height: 40px;
@@ -14,7 +14,7 @@ body,
 #root {
   font-family: sans-serif;
   font-size: 21px;
-  line-height: 1;
+  line-height: 1.15;
   color: var(--color__text);
   background-color: var(--color__bg);
   height: 100%;
@@ -106,25 +106,46 @@ ul.combobox__menu {
   height: var(--timeline__step-height);
 }
 
-.timeline__track-division:not(:first-child) {
+.timeline__track-hour-container {
+  position: absolute;
+  top: 0;
+  left: calc(-1 * var(--timeline__h-offset));
+  background-color: var(--color__bg);
+  z-index: 2;
+  width: var(--timeline__h-offset);
+}
+
+.timeline__track-division--day:not(:first-child) {
   border-top: 2px solid var(--color__ui);
 }
 
-.timeline__track-division[data-time='day'] {
+.timeline__track-division--day[data-time='day'] {
   background-color: #a1b8cd;
 }
 
-.timeline__track-division[data-time='night'] {
+.timeline__track-division--day[data-time='night'] {
   background-color: #e3a839;
 }
 
 .timeline__track-hour-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateX(calc(var(--timeline__h-offset) / 3)) translateY(-50%);
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  line-height: 0;
   font-size: 0.6rem;
-  position: absolute;
-  left: -5px;
-  transform: translateX(calc(-100% - var(--timeline__h-offset) / 4))
-    translateY(-50%);
   color: var(--color__text--secondary);
+  z-index: 3;
+  cursor: default;
+}
+
+.timeline__track-hour-label:hover,
+.timeline__track-hour-label[data-active='true'] {
+  background-color: var(--color__text--secondary);
+  color: #fff;
 }
 
 .timeline__track-marker {
@@ -136,21 +157,28 @@ ul.combobox__menu {
   z-index: 2;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
 }
 
 .timeline__track-marker-label,
 .timeline__track-marker-time {
   text-align: right;
 }
+
 .timeline__track-marker-label {
+  position: relative;
+  top: -1rem;
   font-family: Georgia, Times, 'Times New Roman', serif;
   font-size: 1.2rem;
   color: var(--color__text--highlight);
-  line-height: 0;
+  max-width: 320px;
 }
 
 .timeline__track-marker-time {
   font-size: 3.5rem;
   font-weight: 800;
-  padding: 8px 0;
+}
+
+.timeline__track-marker-period {
+  color: var(--color__text--secondary);
 }
