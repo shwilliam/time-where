@@ -53,7 +53,7 @@ export const TimezonesCombobox = () => {
         ),
       )
     },
-    itemToString: ({name}) => name,
+    itemToString: timezone => timezone?.name,
     defaultHighlightedIndex: 0,
   })
 
@@ -64,7 +64,11 @@ export const TimezonesCombobox = () => {
       </label>
 
       <div className="combobox__input-container" {...getComboboxProps()}>
-        <input className="input combobox__input" {...getInputProps()} />
+        <input
+          className="input combobox__input"
+          placeholder="Timezone..."
+          {...getInputProps()}
+        />
         <button
           className="button combobox__toggle"
           {...getToggleButtonProps()}
