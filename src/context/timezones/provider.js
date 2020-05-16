@@ -8,25 +8,20 @@ export const TimezonesContextProvider = ({children}) => {
     if (!timezone) return
 
     const time = moment().tz(timezone.value)
-    const hour24 = time.format('H')
-    const minutes = time.format('mm')
+    const timeOffset = time.format('ZZ')
 
-    const existingTimezoneIdx = timezones.findIndex(timezone => {
-      const existingTime = moment().tz(timezone.value)
-      const existingHour24 = existingTime.format('H')
-      const existingMinutes = existingTime.format('mm')
-
-      return existingHour24 === hour24 && existingMinutes === minutes
-    })
+    const existingTimezoneIdx = timezones.findIndex(
+      timezone => timezone.offset === timeOffset,
+    )
 
     setTimezones(s => {
       if (existingTimezoneIdx !== -1) {
         const filteredTimezones = [...timezones]
         filteredTimezones.splice(existingTimezoneIdx, 1)
 
-        return [...filteredTimezones, timezone]
+        return [...filteredTimezones, {...timezone, offset: timeOffset}]
       }
-      return [...s, timezone]
+      return [...s, {...timezone, offset: timeOffset}]
     })
   }
 

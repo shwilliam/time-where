@@ -2,14 +2,14 @@ import React, {useContext} from 'react'
 import {motion} from 'framer-motion'
 import moment from 'moment-timezone'
 import {TimezonesCombobox} from './components'
-import {TimezonesContext} from './context'
+import {TimezonesContext, HourOffsetContext} from './context'
 
 const TIMELINE_STEP_HEIGHT = 40
 
 const TimelineHourMarkers = () =>
   Array.from({length: 25}, (_, i) => (
     <div
-      className="timeline__track-division"
+      className="timeline__track-division timeline__track-division--day"
       data-time={i > 12 ? 'night' : 'day'}
       key={i}
     />
@@ -18,12 +18,64 @@ const TimelineHourMarkers = () =>
 const TimelineHourMarkersLabels = () => (
   <div className="timeline__track-hour-container">
     {Array.from({length: 25}, (_, i) => (
-      <div className="timeline__track-division" key={i}>
-        {i !== 0 && <p className="timeline__track-hour-label">{i}</p>}
-      </div>
+      <TimelineHourMarkersLabel hour={i} key={i} />
     ))}
   </div>
 )
+
+const TimelineHourMarkersLabel = ({hour}) => {
+  const [activeHours, setActiveHours] = useContext(HourOffsetContext)
+  const {timezones} = useContext(TimezonesContext)
+
+  // TODO: move logic into hook
+
+  const handleMouseEnter = () => {
+    // const minTimezoneOffset = Math.min(
+    //   ...timezones.map(({offset}) =>
+    //     Number(`${offset[0]}${offset[1]}${offset[2]}`),
+    //   ),
+    // )
+
+    const timezoneHours = timezones.map(({offset}) => {
+      // disregard minutes
+      const sign = offset[0]
+      const hours = Number(`${offset[1]}${offset[2]}`)
+      const hourOffset = Number(`${sign}${hours}`) + 12
+      const relativeHour = hourOffset + hour
+      return relativeHour
+    })
+
+    const normalizedTimezoneHours = timezoneHours.map(timezoneHour => {
+      const shiftedHour =
+        timezoneHour - (timezoneHours[timezoneHours.length - 1] - hour)
+      const normalizedRelativeHour =
+        shiftedHour > 24
+          ? shiftedHour - 24
+          : shiftedHour < 0
+          ? shiftedHour + 24
+          : shiftedHour
+      return normalizedRelativeHour
+    })
+
+    setActiveHours(normalizedTimezoneHours)
+  }
+  const handleMouseLeave = () => setActiveHours([])
+
+  return (
+    <div className="timeline__track-division">
+      {hour !== 0 && (
+        <p
+          className="timeline__track-hour-label"
+          data-active={activeHours?.includes(hour)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {hour}
+        </p>
+      )}
+    </div>
+  )
+}
 
 const Timeline = () => {
   const {timezones} = useContext(TimezonesContext)
